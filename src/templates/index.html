@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+	<title>File Vault</title>
+    
+	<head>	
+
+	<style type="text/css">
+		.example {
+		  padding: 10px;
+		  border: 1px solid #ccc;
+		}
+		#drop_zone {
+		  border: 2px dashed #bbb;
+		  -moz-border-radius: 5px;
+		  padding: 100px;
+		  text-align: center;
+		}
+	</style>
+	
+		<script src="Scripts/FV_MainMenu.js"></script>
+		<script src="Scripts/FV_AudioBrowser.js"></script>
+		<script src="Scripts/FV_VideoBrowser.js"></script>
+		<script src="Scripts/FV_TextBrowser.js"></script>
+		<script src="Scripts/FV_ImageBrowser.js"></script>
+		<script src="Scripts/FV_OtherBrowser.js"></script>
+		<script src="Scripts/FV_ModalStream.js"></script>
+		<script src="Scripts/FV_SortTable.js"></script>
+		<script src="Scripts/FV_Table.js"></script>
+		<script src="Scripts/TestData.js"></script>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="http://malsup.github.com/chili-1.7.pack.js"></script>
+		<script type="text/javascript" src="jquery.metadata.js"></script> 
+		<script type="text/javascript" src="http://github.com/malsup/media/raw/master/jquery.media.js?v0.92"></script>
+		
+	</head>
+	<body>
+		<div id = "Title" 
+		style="position:absolute;top:0%; left: 0px; font-size:100px; color:white; border: 2px solid #333333; -moz-border-radius : 10px; height: 100px; width: 1680px; z-index:100;background-color:rgba(0,0,0,0.3);">
+		<center> File Vault </center>
+		</div>
+		
+		<div id="MainWindow"
+		style="position:absolute; top:0%; left:0px; border: 2px solid #333333; -moz-border-radius : 10px; height:1000px; width: 1680px; margin: 105px 0px 0px 0px; z-index:101;background-color:rgba(0,0,0,0.3);">
+		</div>
+		<script>
+		//Load the Main Menu into the MainWindow Div to start...
+		var MainWindow, MainMenuDiv, VideoBrowserDiv, AudioBrowserDiv, ImageBrowserDiv, TextBrowserDiv, OtherBrowserDiv;
+		MainWindow = document.getElementById("MainWindow");
+		MainMenuDiv = new MainMenu();
+		MainWindow.appendChild(MainMenuDiv.Load());
+		</script>
+	</body>	
+</html>
