@@ -2,13 +2,17 @@ import os
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
-
 from google.appengine.ext.webapp.util import run_wsgi_app
-
 from google.appengine.ext import db
+
+class FileModel(db.Model):
+    name = db.StringProperty(required=True)
+    data = db.BlobProperty(required=True)
+    mimeType = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    owner = db.UserProperty(auto_current_user_add=True)
  
-class MainHandler(webapp.RequestHandler):
-    
+class MainHandler(webapp.RequestHandler):    
     def get(self): 
         path = self.request.path
         temp = os.path.join(
@@ -20,16 +24,9 @@ class MainHandler(webapp.RequestHandler):
             'templates/index.html')   
             
         outstr = template.render(temp, {})
-        self.response.out.write(outstr)
-        
-class FileModel(db.Model):
-    name = db.StringProperty(required=True)
-    data = db.BlobProperty(required=True)
-    mimeType = db.StringProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-    owner = db.UserProperty(auto_current_user_add=True)
+        self.response.out.write(outstr)        
  
-class UploadHandler(webapp.RequestHandler):        
+class UploadHandler(webapp.RequestHandler):   
     def post(self):
         files = self.request.POST.multi.__dict__['_items']
         for allfiles in files:
@@ -52,8 +49,48 @@ class UploadHandler(webapp.RequestHandler):
         return None
 """
 
+class ContentHandler(webapp.RequestHandler):
+    def get(self):        
+        file_list = db.Query(FileModel).order('-created')        
+        outstr = template.render('templates/content.html', {'file_list': file_list})
+        self.response.out.write(outstr)
+        
+class DeleteHandler(webapp.RequestHandler):
+    def post(self):
+        name = self.request.get('NAME')       
+        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
+        #self.response.out.write("deleting...")  
+        db.delete(q)        
+        self.redirect('/', True)        
+        
+class DownloadHandler(webapp.RequestHandler):
+    def post(self):
+        name = self.request.get('NAME')
+        
+        FileModel = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
+        for data in FileModel:
+            if data.name:
+                self.response.headers['Content-Disposition'] = 'attachment; filename="%s"' % str(data.name)
+                self.response.headers['Content-Type'] = data.mimeType
+                self.response.out.write(data.data)  
+                
+class ViewHandler(webapp.RequestHandler):
+    def post(self):
+        name = self.request.get('NAME')
+        
+        FileModel = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
+        for data in FileModel:
+            if data.name:
+                self.response.headers['Content-Type'] = data.mimeType
+                self.response.out.write(data.data)
+
+
 application = webapp.WSGIApplication([
+                                      ('/view', ViewHandler),
+                                      ('/download', DownloadHandler),
+                                      ('/content', ContentHandler),
                                       ('/upload', UploadHandler),
+                                      ('/delete', DeleteHandler),
                                       ('/.*', MainHandler)],
                                       debug=True)
 
@@ -62,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
