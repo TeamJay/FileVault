@@ -68,12 +68,9 @@ ModalStream.prototype.CreateModal = function() {
 	Player.className = "media {width:500, height:400}";
 	Player.href = this.Src;
        this.Modal.appendChild(this.CloseButton());
-        this.Modal.appendChild(Player);
- 
+        this.Modal.appendChild(Player); 
 	
-	this.Container.appendChild(this.Modal);
-	
-
+	this.Container.appendChild(this.Modal);	
 	
 	$(function() {
 		console.log("here");

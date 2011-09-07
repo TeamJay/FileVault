@@ -1,3 +1,4 @@
+
 function Table(string_TableName) {
 	this.Table = document.createElement('table');
 	this.Table.id = string_TableName;
@@ -14,16 +15,14 @@ function Table(string_TableName) {
 	this.Table.appendChild(this.TBody);
 	this.TBody.id = "body";
  
-	this.RowCounter = 1;
- 
+	this.RowCounter = 1; 
 }
 
 Table.prototype.ReturnSelectedRow = function() {
 	var SelectedRow = null;
 	for(var i =1; i < this.Table.rows.length; i++) {
 		if(this.Table.rows[i].getAttribute("selected") == "true") { SelectedRow = this.Table.rows[i]; }
-	}
-	
+	}	
 	return SelectedRow;
 }
  
@@ -33,9 +32,7 @@ Table.prototype.ColumnHeaders = function(object_RowData) {
 	for(var key in object_RowData) {
 		var CCell = CRow.insertCell(-1);
 		CCell.innerHTML = key;
-	}
-
-	
+	}	
 }
  
 Table.prototype.AddRow = function (object_RowData) {
@@ -51,8 +48,7 @@ Table.prototype.AddRow = function (object_RowData) {
 		CCell.onmouseover = this.create(this,this.MouseOver);
 		CCell.onmouseout = this.create(this,this.MouseOut);
 		CCell.onclick = this.create(this, this.SelectRow);
-	}
- 
+	} 
 	this.RowCounter++;
 }
 
@@ -107,8 +103,7 @@ Table.prototype.SelectRow = function(e) {
 		e.target.parentElement.parentElement.rows[i].style.backgroundColor = "lightslategray";
 	}
 	
-	if(e.target.parentElement.getAttribute("selected") == "false") {
-		
+	if(e.target.parentElement.getAttribute("selected") == "false") {		
 		e.target.parentElement.style.backgroundColor = "#8888FF";
 		e.target.parentElement.setAttribute("Selected", true);
 	}
@@ -123,4 +118,4 @@ Table.prototype.MouseOut = function(e) {
 		e.target.parentElement.style.backgroundColor = "lightslategray";
 	}
 }
- 
+

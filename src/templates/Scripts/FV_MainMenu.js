@@ -43,9 +43,7 @@ MainMenu.prototype.CreateButtons = function() {
 	this.AudioButton.style.fontSize = "60px";
 	this.AudioButton.setAttribute("position", "absolute");
 	this.ABdiv.appendChild(this.AudioButton);
-	this.AudioButton.onclick = this.AudioButtonPress;
-
-	
+	this.AudioButton.onclick = this.AudioButtonPress;	
 		
 	this.TextButton = document.createElement('button');
 	this.TBdiv = document.createElement('div');
