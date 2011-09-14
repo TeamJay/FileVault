@@ -76,7 +76,6 @@ ModalStream.prototype.CreateModal = function() {
 		console.log("here");
 		$('a.media').media( { width: 500, height: 400 } );
 	});
-
 }
 
 ModalStream.prototype.create = function(obj, func){
