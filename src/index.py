@@ -11,6 +11,7 @@ class FileModel(db.Model):
     mimeType = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     owner = db.UserProperty(auto_current_user_add=True)
+    download_url = db.StringProperty()
  
 class MainHandler(webapp.RequestHandler):    
     def get(self): 
@@ -21,21 +22,28 @@ class MainHandler(webapp.RequestHandler):
         if not os.path.isfile(temp):
             temp = os.path.join(
             os.path.dirname(__file__),
-            'templates/index.html')   
+            'templates/index.html')
             
         outstr = template.render(temp, {})
-        self.response.out.write(outstr)        
+        self.response.out.write(outstr)      
  
-class UploadHandler(webapp.RequestHandler):   
+class UploadHandler(webapp.RequestHandler):
     def post(self):
         files = self.request.POST.multi.__dict__['_items']
-        for allfiles in files:
+        
+        for allfiles in files:            
             allfiles = allfiles[1]
             obj = FileModel(name=allfiles.filename, 
-                            data=allfiles.value, mimeType=allfiles.type)
+                            data=allfiles.value, mimeType=allfiles.type) 
+            obj.put()  
+                
+            file_url = "http://%s/%d/%s" % (self.request.host, obj.key().id(), allfiles.filename)
+            #file_url = "<a href='%s'>%s</a>" % (file_url,file_url) 
+                
+            obj.download_url=file_url                
             obj.put()
                 
-        self.redirect('/', True)
+            self.redirect('/', True)
           
 """
     # converts supported file extensions to MIME type
@@ -58,10 +66,9 @@ class ContentHandler(webapp.RequestHandler):
 class DeleteHandler(webapp.RequestHandler):
     def post(self):
         name = self.request.get('NAME')       
-        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
-        #self.response.out.write("deleting...")  
+        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'") 
         db.delete(q)        
-        self.redirect('/', True)        
+        self.redirect('/', True)    
         
 class DownloadHandler(webapp.RequestHandler):
     def post(self):
@@ -83,9 +90,15 @@ class ViewHandler(webapp.RequestHandler):
             if data.name:
                 self.response.headers['Content-Type'] = data.mimeType
                 self.response.out.write(data.data)
-
+                
+class StreamHandler(webapp.RequestHandler):
+    def get(self,id,filename):
+        entity = FileModel.get_by_id(int(id))
+        self.response.headers['Content-Type'] = entity.mimeType
+        self.response.out.write(entity.data)
 
 application = webapp.WSGIApplication([
+                                      ('/(\d+)/(.*)', StreamHandler),
                                       ('/view', ViewHandler),
                                       ('/download', DownloadHandler),
                                       ('/content', ContentHandler),

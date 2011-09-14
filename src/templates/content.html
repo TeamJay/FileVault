@@ -6,7 +6,7 @@
         <th>Type</th>
         <th>Delete</th>
         <th>Download</th>
-        <th>View</th>
+        <th>URL</th>
     </tr>
    
     {% for file in file_list %}    
@@ -16,7 +16,10 @@
         <td>{{ file.mimeType }}</td>
         <td><form method="post" action="/delete"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Delete"></form></td>
         <td><form method="post" action="/download"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Download"></form></td>
-        <td><form method="post" action="/view"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="View"></form></td>
+<!--         <td><form method="post" action="/view"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="View"></form></td> -->
+    	<td><a href='{{ file.download_url }}'>{{ file.download_url }}</a></td>
+<!--     	<td><video src="{{ file.download_url }}" width="320" height="240" controls></video></td> -->
+<!--     	<td><audio src="{{ file.download_url }}" controls></audio></td> -->
     </tr>    
 
     {% endfor %}
