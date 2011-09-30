@@ -12,6 +12,12 @@ indexes:
 
 - kind: FileModel
   properties:
+  - name: fileType
+  - name: created
+    direction: desc
+
+- kind: FileModel
+  properties:
   - name: mimeType
   - name: created
     direction: desc

@@ -30,7 +30,6 @@ function TSorter(){
 		
 		for(var i = 0; i < ths.length ; i++)
 		{
-			console.log(ths[i]);
 			ths[i].onclick = function()
 			{
 				sort(this);

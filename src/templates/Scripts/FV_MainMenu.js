@@ -97,9 +97,9 @@ MainMenu.prototype.VideoButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	if(!VideoBrowserDiv) {
-		VideoBrowserDiv = new VideoBrowser();
-	}
+	//if(!VideoBrowserDiv) {
+		VideoBrowserDiv = new VideoBrowser("video");
+	//}
 	VideoBrowserDiv.Load();
 }
 
@@ -108,11 +108,10 @@ MainMenu.prototype.AudioButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	if(!AudioBrowserDiv) {
-		AudioBrowserDiv = new AudioBrowser();
-	}
-
-	AudioBrowserDiv.Load();
+	//if(!VideoBrowserDiv) {
+		VideoBrowserDiv = new VideoBrowser("audio");
+	//}
+	VideoBrowserDiv.Load();
 }
 
 MainMenu.prototype.ImageButtonPress = function() {
@@ -120,10 +119,10 @@ MainMenu.prototype.ImageButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	if(!ImageBrowserDiv) {
-		ImageBrowserDiv = new ImageBrowser();
-	}
-	ImageBrowserDiv.Load();
+	//if(!VideoBrowserDiv) {
+		VideoBrowserDiv = new VideoBrowser("image");
+	//}
+	VideoBrowserDiv.Load();
 }
 
 MainMenu.prototype.TextButtonPress = function() {
@@ -131,10 +130,10 @@ MainMenu.prototype.TextButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	if(!TextBrowserDiv) {
-		TextBrowserDiv = new TextBrowser();
-	}
-	TextBrowserDiv.Load();
+	//if(!VideoBrowserDiv) {
+		VideoBrowserDiv = new VideoBrowser("text");
+	//}
+	VideoBrowserDiv.Load();
 }
 
 MainMenu.prototype.OtherButtonPress = function() {
@@ -142,10 +141,10 @@ MainMenu.prototype.OtherButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	if(!OtherBrowserDiv) {
-		OtherBrowserDiv = new OtherBrowser();
-	}
-	OtherBrowserDiv.Load();
+	//if(!VideoBrowserDiv) {
+		VideoBrowserDiv = new VideoBrowser("other");
+	//}
+	VideoBrowserDiv.Load();
 }
 
 MainMenu.prototype.create = function(obj, func){

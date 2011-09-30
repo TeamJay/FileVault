@@ -2,9 +2,11 @@ function ModalStream(src) {
 	this.MainWindow = MainWindow;
 
 	this.Src = "";
+	this.Type = "";
 
 	for(var i=0; i<src.cells.length; i++) {
 		if(src.cells[i].id == "Source") { this.Src = src.cells[i].innerHTML; }
+		if(src.cells[i].id == "Type") { this.Type = src.cells[i].innerHTML; }
 	}
 
 	console.log(this.Src);
@@ -31,8 +33,6 @@ ModalStream.prototype.CloseModal = function() {
 
 ModalStream.prototype.CloseButton = function() {
 
-	//Img = new Image(); 
-	//Img.src = "Images/close.png";
 	var Button = document.createElement("div");
 	Button.id = "close";
 	Button.style.float = "right";
@@ -73,9 +73,14 @@ ModalStream.prototype.CreateModal = function() {
 	this.Container.appendChild(this.Modal);	
 	
 	$(function() {
-		console.log("here");
 		$('a.media').media( { width: 500, height: 400 } );
 	});
+
+	if(this.Type == "text/plain") {
+		console.log(this.src);
+	}
+
+	console.log(Player.children);
 }
 
 ModalStream.prototype.create = function(obj, func){

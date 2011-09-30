@@ -1,13 +1,35 @@
 
-function VideoBrowser() {
+/*
+jQuery.download = function(url, data, method){
+	//url and data options required
+	if( url && data ){ 
+		//data can be string of parameters or array/object
+		data = typeof data == 'string' ? data : jQuery.param(data);
+		//split params into form inputs
+		var inputs = '';
+		jQuery.each(data.split('&'), function(){ 
+			var pair = this.split('=');
+			inputs+='<input type="hidden" name="'+ pair[0] +'" value="'+ pair[1] +'" />'; 
+		});
+		//send request
+		jQuery('<form action="'+ url +'" method="'+ (method||'post') +'">'+inputs+'</form>')
+		.appendTo('body').submit().remove();
+	};
+};
+*/
+
+function VideoBrowser(type) {
+	this.type = type;
 	this.MainWindow = MainWindow;
 	this.Container = document.createElement("div");
 	this.UploadForm = document.createElement("form");
 	this.UploadButton = document.createElement("input");
+	this.DeleteButton = document.createElement("button");
 	this.SubmitForm = document.createElement("input");
 	this.DownloadButton = document.createElement("button");
 	this.SearchButton = document.createElement("button");
 	this.FilterBy = document.createElement("select");
+	this.DownloadForm = document.createElement("form");
 	//Filter list is document.createElement(option) then innerHTML for text...
 	this.SearchBar = document.createElement("input");
 
@@ -16,18 +38,44 @@ function VideoBrowser() {
 	this.ReturnButton = document.createElement("button");
 
 	this.Table = null;
-
+	this.ReturnedData = null;
 	this.Output = [];
 	this.Files = null
+	
+	this.DownloadInterval = null;
+	this.DownloadListName = [];
+	this.DownloadListSource = [];
+	this.DeleteList = null;
+
+	var closure = this;
 
 	this.GenerateLayout();
-	
 	//update browser
+
 	$.ajax({
 		url: "/content",
 		cache: false,
+		data: {content : this.type},
 		success: function(html){
-			$("#BrowserWindow").html(html);			
+			$("#BrowserWindow").html(html);	
+			closure.ReturnedData = objectList;	
+			closure.VideoBrowserMaker();			
+		}
+	});
+	
+	//this.intervalInt = setInterval(this.VideoBrowserMaker, 500);
+}
+
+VideoBrowser.prototype.PollServer = function() {
+	var closure = this;
+	$.ajax({
+		url: "/content",
+		cache: false,
+		data: {content : this.type},
+		success: function(html){
+			$("#BrowserWindow").html(html);	
+			closure.ReturnedData = objectList;	
+			closure.VideoBrowserMaker();			
 		}
 	});
 }
@@ -66,21 +114,33 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.UBdiv.appendChild(this.UploadForm);
 	this.UploadForm.appendChild(this.UploadButton);
 	this.UploadForm.appendChild(this.SubmitForm);
-
 	
-  	//download button
 	this.DBdiv = document.createElement('div');
 	this.DBdiv.style.position = "relative";
 	this.DownloadButton.setAttribute('type','button');
 	this.DownloadButton.innerHTML = "Download";
-	this.DownloadButton.style.width = "150px";
+	this.DownloadButton.style.width = "80px";
+	this.DownloadButton.style.height = "30px";
 	this.DownloadButton.style.fontSize = "15px";
 	this.DBdiv.style.margin = "10px 0px 0px 10px";
-	//this.DBdiv.appendChild(this.DownloadButton);
+	this.DBdiv.appendChild(this.DownloadButton);
 	this.DBdiv.style.float = "left";
 	this.DBdiv.style.cssFloat = "left";
-  	//this.DownloadButton.onclick = this.create(this,this.DownloadButtonPress);
-	
+  	this.DownloadButton.onclick = this.create(this,this.DownloadButtonPress);
+  	
+	//delete button
+	this.DeBdiv = document.createElement('div');
+	this.DeBdiv.style.position = "relative";
+	this.DeleteButton.setAttribute('type','button');
+	this.DeleteButton.innerHTML = "Delete";
+	this.DeleteButton.style.width = "80px";
+	this.DeleteButton.style.height = "30px";
+	this.DeleteButton.style.fontSize = "15px";
+	this.DeBdiv.style.margin = "10px 0px 0px 10px";
+	this.DeBdiv.appendChild(this.DeleteButton);
+	this.DeBdiv.style.float = "left";
+	this.DeBdiv.style.cssFloat = "left";
+  	this.DeleteButton.onclick = this.create(this,this.DeleteButtonPress);	
 	
   	//filter
 	this.Fdiv = document.createElement('div');
@@ -136,8 +196,6 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.BrowserWindow.style.margin = "45px 0px 0px 300px";
 	this.BrowserWindow.style.overflow = "auto";
 
-	//this.VideoBrowserMaker();
-
 	this.Container.appendChild(this.BrowserWindow);	
 
 	//Return to Menu Button...
@@ -161,41 +219,131 @@ VideoBrowser.prototype.GenerateLayout = function() {
 //---events---
 
 VideoBrowser.prototype.UploadButtonPress = function(evt) {
-	console.log(evt.target.files);
-	this.Files = evt.target.files; // FileList object
-    	// files is a FileList of File objects. List some properties.
-
-    	for (var i = 0, f; f = this.Files[i]; i++) {
-     		this.Output.push(['<li><strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
-          	f.size, ' bytes, last modified: ',
-                f.lastModifiedDate.toLocaleDateString(), '</li>']);
-    	}
+	alert(evt.target.files);
+	this.Files = evt.target.files; // FileList    	
 }
 
 VideoBrowser.prototype.DownloadButtonPress = function(evt) {
-
+	
 	if(this.Table) {
-		var SelectedRow = this.Table.ReturnSelectedRow();
-		if(SelectedRow) {
-		
-			for(var i=0; i< SelectedRow.cells.length; i++) {
-				if(SelectedRow.cells[i].id == "Source") {
-					var Src = SelectedRow.cells[i].innerHTML;
-					window.open(Src,'Download');
+		this.DownloadListName = [];
+		this.DownloadListSource = [];
+	
+		var SelectedRows = this.Table.ReturnSelectedRows();
+		if(SelectedRows.length != 0) {
+
+			for(var j=0; j< SelectedRows.length; j++) {
+			
+				for(var i=0; i< SelectedRows[j].cells.length; i++) {
+					if(SelectedRows[j].cells[i].id == "Name") {
+
+						this.DownloadListName.push(SelectedRows[j].cells[i].innerHTML);
+
+					}
+					if(SelectedRows[j].cells[i].id == "Source") {
+
+						this.DownloadListSource.push(SelectedRows[j].cells[i].innerHTML);
+					}
 				}
 			}
+			var closure = this;
+			
+			this.Download();			
+		}
+	}	
+}
+
+VideoBrowser.prototype.DeleteButtonPress = function(evt) {
+	
+	if(this.Table) {
+
+		this.DeleteList = [];
+	
+		var SelectedRows = this.Table.ReturnSelectedRows();
+		if(SelectedRows.length != 0) {
+
+			for(var j=0; j< SelectedRows.length; j++) {
+			
+				for(var i=0; i< SelectedRows[j].cells.length; i++) {
+					if(SelectedRows[j].cells[i].id == "Name") {
+
+					this.DeleteList.push(SelectedRows[j].cells[i].innerHTML);
+
+					}
+				}
+			}
+			var closure = this;
+			
+			this.Delete();			
 		}
 	}	
 }
 
 VideoBrowser.prototype.SearchButtonPress = function(evt) {
-	//this.VideoBrowserMaker(this.SearchBar.value);
+	this.VideoBrowserMaker(this.SearchBar.value);
+}
+
+VideoBrowser.prototype.Download = function() {
+
+	var closure = this;
+
+	if(this.DownloadListName.length == 1) {
+		$.download('/download', { name : "NAME", value : closure.DownloadListName[0] });
+	}
+	else {
+		for(var i =0; i<this.DownloadListSource.length; i++) {
+			var iframe = document.createElement("iframe");
+			iframe.name = "temp";
+			iframe.src=this.DownloadListSource[i];
+			iframe.style.display = "none";
+			document.body.appendChild(iframe);
+		}
+	}
+	
+	//http://localhost:8080/download?name=NAME&value=13+Lee.wma
+/*	$.ajax({
+		  url: "/download",
+		  type: 'POST',
+		  data: { name : "NAME", value: closure.DownloadList[i]},
+		  success: function(data, status){
+			console.log(data);
+		  }
+		});
+	}	
+*/	
+	//setTimeout(this.RemoveIframes, 500);
+}
+
+VideoBrowser.prototype.RemoveIframes = function() {
+
+	var toremove = document.getElementsByName('temp');
+	for(var i =0; i< toremove; i++) {
+		document.body.removeChild(toremove[i]);
+	}
+}
+
+VideoBrowser.prototype.Delete = function() {
+
+	var closure = this;
+
+	for(var i =0; i<this.DeleteList.length; i++) {
+
+		$.ajax({
+		  url: "/delete",
+		  type: 'POST',
+		  data: {name : "NAME", value: closure.DeleteList[i]},
+		  success: function(data, status){
+		    closure.PollServer();
+		  }
+		});
+	}	
 }
 
 //helper add buttons
 VideoBrowser.prototype.AppendButtons = function() {
 	this.Container.appendChild(this.UBdiv);
 	this.Container.appendChild(this.DBdiv);
+	this.Container.appendChild(this.DeBdiv);
 	this.Container.appendChild(this.Fdiv);
 	this.Container.appendChild(this.Sdiv);
 	this.Container.appendChild(this.SBdiv);
@@ -203,6 +351,7 @@ VideoBrowser.prototype.AppendButtons = function() {
 
 //swap to main menu
 VideoBrowser.prototype.ReturnButtonPress = function() {
+	this.type = "";
 	MainWindow.removeChild(VideoBrowserDiv.Container);
 	MainWindow.appendChild(MainMenuDiv.Load());
 }
@@ -212,20 +361,20 @@ VideoBrowser.prototype.create = function(obj, func){
         var target = arguments.callee.target;
         var func = arguments.callee.func;
         return func.apply(target, arguments);
-    };
-    
+    };    
     f.target = obj;
     f.func = func;
     return f;
 }
 
-/*
 //content browser list
 VideoBrowser.prototype.VideoBrowserMaker = function(string_SearchParamater) {
 
+if(this.ReturnedData) {
+	clearInterval(this.intervalInt);
 	if(this.Table) { 
 		if(this.Table.Table) {
-			var parent = this.Table.Table.parentElement;
+			var parent = this.Table.Table.parentNode;
 			if(parent) { parent.removeChild(this.Table.ReturnTable()); }
 			this.Table = null;
 		}
@@ -233,7 +382,7 @@ VideoBrowser.prototype.VideoBrowserMaker = function(string_SearchParamater) {
 
 	this.Table = new Table("VideoTable");
 	 
-	this.Table.ColumnHeaders(FileList.List[0]);
+	this.Table.ColumnHeaders(this.ReturnedData.List[0]);
 
 	if(string_SearchParamater) {
 		//create pattern from input
@@ -245,11 +394,11 @@ VideoBrowser.prototype.VideoBrowserMaker = function(string_SearchParamater) {
 		
 		var AddRow = [];
 		
-		for(var i=0; i<FileList.List.length; i++) {
+		for(var i=0; i<this.ReturnedData.List.length; i++) {
 			
-			for(var key in FileList.List[i]) {
-				if(patt.test(FileList.List[i][key])) {
-					AddRow[i] = FileList.List[i];
+			for(var key in this.ReturnedData.List[i]) {
+				if(patt.test(this.ReturnedData.List[i][key])) {
+					AddRow[i] = this.ReturnedData.List[i];
 				}
 			}		
 		}
@@ -272,10 +421,9 @@ VideoBrowser.prototype.VideoBrowserMaker = function(string_SearchParamater) {
 	}
 	else {
 	 
-		for(var i=0; i<FileList.List.length; i++) {
-			var obj = FileList.List[i];
-			this.Table.AddRow(obj);
-	 
+		for(var i=0; i<this.ReturnedData.List.length; i++) {
+			var obj = this.ReturnedData.List[i];
+			this.Table.AddRow(obj);	 
 		}
 	 
 		this.Table.Table.rows[0].style.backgroundColor = 'black';
@@ -286,12 +434,15 @@ VideoBrowser.prototype.VideoBrowserMaker = function(string_SearchParamater) {
 			this.Table.Table.rows[0].cells[i].style.width = "200px";
 		} 
 
-		this.Table.AddStreamButton();
+		//this.Table.AddDownloadButton();
+		//this.Table.AddDeleteButton();
+		this.Table.AddStreamButton();		
 	 
-		this.BrowserWindow.appendChild(this.Table.ReturnTable());
+		this.BrowserWindow.appendChild(this.Table.ReturnTable());		
  	}
 
  	var Table1Sorter = new TSorter;
 	Table1Sorter.init(this.Table.Table);
+	}
 }
-*/
+

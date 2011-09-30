@@ -25,6 +25,14 @@ Table.prototype.ReturnSelectedRow = function() {
 	}	
 	return SelectedRow;
 }
+
+Table.prototype.ReturnSelectedRows = function() {
+	var SelectedRows = [];
+	for(var i =1; i < this.Table.rows.length; i++) {
+		if(this.Table.rows[i].getAttribute("selected") == "true") { SelectedRows.push(this.Table.rows[i]); }
+	}	
+	return SelectedRows;
+}
  
 Table.prototype.ColumnHeaders = function(object_RowData) {
  
@@ -69,6 +77,64 @@ Table.prototype.AddStreamButton = function() {
 	}
 }
 
+Table.prototype.AddDownloadButton = function() {
+
+	var DownloadColumn = this.Table.rows[0].insertCell(-1);
+	DownloadColumn.innerHTML = "Download";
+
+	for(var i=1; i< this.Table.rows.length; i++) {
+		var CCell = this.Table.rows[i].insertCell(-1);
+		var downloadForm = document.createElement("FORM");
+		downloadForm.method = "post";
+		downloadForm.action = "/download";
+
+		var downloadButton = document.createElement("input");
+		downloadButton.type = "hidden";
+		downloadButton.name = "NAME";
+		downloadButton.value = this.Table.rows[i].cells[0].innerHTML;
+
+		var downloadButtonB = document.createElement("input");
+		downloadButtonB.type = "submit";
+		downloadButtonB.value = "Download";
+		
+		downloadForm.appendChild(downloadButton);
+		downloadForm.appendChild(downloadButtonB);
+		CCell.appendChild(downloadForm);
+
+	}
+}
+
+Table.prototype.AddDeleteButton = function() {
+
+	var DeleteColumn = this.Table.rows[0].insertCell(-1);
+	DeleteColumn.innerHTML = "Delete";
+
+	for(var i=1; i< this.Table.rows.length; i++) {
+		var CCell = this.Table.rows[i].insertCell(-1);
+		var deleteForm = document.createElement("FORM");
+		deleteForm.method = "post";
+		deleteForm.action = "/delete";
+
+		var deleteButton = document.createElement("input");
+		deleteButton.type = "hidden";
+		deleteButton.name = "NAME";
+		deleteButton.value = this.Table.rows[i].cells[0].innerHTML;
+
+		var deleteButtonB = document.createElement("input");
+		deleteButtonB.type = "submit";
+		deleteButtonB.value = "Delete";
+		
+		deleteForm.appendChild(deleteButton);
+		deleteForm.appendChild(deleteButtonB);
+		CCell.appendChild(deleteForm);
+
+	}
+}
+
+//<form id="delete" method="post" action="/delete"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Delete"></form>
+//<td><form method="post" action="/download"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Download"></form></td>
+
+
 Table.prototype.LaunchModal = function(e) {
 	for(var i=0; i<this.Table.rows.length; i++) {
 		for(var j=0; j<this.Table.rows[i].cells.length; j++) {
@@ -98,24 +164,23 @@ Table.prototype.ReturnTable = function() {
 
 Table.prototype.SelectRow = function(e) {
 
-	for(var i =0; i< e.target.parentElement.parentElement.rows.length; i++) {
-		e.target.parentElement.parentElement.rows[i].setAttribute("Selected", false);
-		e.target.parentElement.parentElement.rows[i].style.backgroundColor = "lightslategray";
+	if(e.target.parentNode.getAttribute("selected") == "true") {
+		e.target.parentNode.setAttribute("Selected", false);
+		e.target.parentNode.style.backgroundColor = "lightslategray";
 	}
-	
-	if(e.target.parentElement.getAttribute("selected") == "false") {		
-		e.target.parentElement.style.backgroundColor = "#8888FF";
-		e.target.parentElement.setAttribute("Selected", true);
+	else {
+		e.target.parentNode.style.backgroundColor = "#8888FF";
+		e.target.parentNode.setAttribute("Selected", true);
 	}
 }
 
 Table.prototype.MouseOver = function(e) {
-	e.target.parentElement.style.backgroundColor = "#8888FF";
+	e.target.parentNode.style.backgroundColor = "#8888FF";
 }
 
 Table.prototype.MouseOut = function(e) {
-	if(e.target.parentElement.getAttribute("selected") == "false") {
-		e.target.parentElement.style.backgroundColor = "lightslategray";
+	if(e.target.parentNode.getAttribute("selected") == "false") {
+		e.target.parentNode.style.backgroundColor = "lightslategray";
 	}
 }
 
