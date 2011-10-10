@@ -80,7 +80,7 @@ $.fn.media = function(options, f1, f2) {
 			}
 			var $div = $.fn.media[fn](this, o);
 
-			$div.css('backgroundColor', o.bgColor).width(o.width);
+			$div.css('backgroundColor', "black").width(o.width);
 			
 			if (o.canUndo) {
 				var $temp = $('<div></div>').append(this);
@@ -115,7 +115,8 @@ $.fn.media.defaults = {
 	width:		400,
 	height:		400,
 	autoplay:	0,		   	// normalized cross-player setting
-	bgColor:	'#ffffff', 	// background color
+	bgColor:	'black', 	// background color
+	backgroundColor: 'black',
 	params:		{ wmode: 'transparent'},	// added to object element as param elements; added to embed element as attrs
 	attrs:		{},			// added to object and embed elements as attrs
 	flvKeyName: 'file', 	// key used for object src param (thanks to Andrea Ercolino)

@@ -211,7 +211,7 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.RBdiv.appendChild(this.ReturnButton);
 	this.RBdiv.style.float = "left";
 	this.RBdiv.style.cssFloat = "left";
-	this.ReturnButton.onclick = this.ReturnButtonPress;
+	this.ReturnButton.onclick = this.create(this,this.ReturnButtonPress);
 
 	this.Container.appendChild(this.RBdiv);	
 }
@@ -224,7 +224,7 @@ VideoBrowser.prototype.UploadButtonPress = function(evt) {
 }
 
 VideoBrowser.prototype.DownloadButtonPress = function(evt) {
-	
+
 	if(this.Table) {
 		this.DownloadListName = [];
 		this.DownloadListSource = [];
@@ -247,7 +247,7 @@ VideoBrowser.prototype.DownloadButtonPress = function(evt) {
 				}
 			}
 			var closure = this;
-			
+			console.log(this.DownloadListName);
 			this.Download();			
 		}
 	}	
@@ -287,7 +287,27 @@ VideoBrowser.prototype.Download = function() {
 
 	var closure = this;
 
-	if(this.DownloadListName.length == 1) {
+	var downloadForm = document.createElement("FORM");
+	downloadForm.method = "post";
+	downloadForm.action = "/download";
+
+	var downloadButton = document.createElement("input");
+	downloadButton.type = "hidden";
+	downloadButton.name = "NAME";
+	console.log(closure.DownloadListName[0]);
+	downloadButton.value = closure.DownloadListName[0];
+
+	var downloadButtonB = document.createElement("input");
+	downloadButtonB.type = "submit";
+	downloadButtonB.value = "Download";
+	
+	downloadForm.appendChild(downloadButton);
+	downloadForm.appendChild(downloadButtonB);
+
+	//document.body.appendChild(downloadForm);
+	downloadButtonB.click();
+
+/*if(this.DownloadListName.length == 1) {
 		$.download('/download', { name : "NAME", value : closure.DownloadListName[0] });
 	}
 	else {
@@ -299,6 +319,7 @@ VideoBrowser.prototype.Download = function() {
 			document.body.appendChild(iframe);
 		}
 	}
+*/
 	
 	//http://localhost:8080/download?name=NAME&value=13+Lee.wma
 /*	$.ajax({
@@ -351,8 +372,13 @@ VideoBrowser.prototype.AppendButtons = function() {
 
 //swap to main menu
 VideoBrowser.prototype.ReturnButtonPress = function() {
-	this.type = "";
-	MainWindow.removeChild(VideoBrowserDiv.Container);
+	console.log(this);
+	if(this.type == "video") { MainWindow.removeChild(VideoBrowserDiv.Container); }
+	if(this.type == "text") { MainWindow.removeChild(TextBrowserDiv.Container); }
+	if(this.type == "audio") { MainWindow.removeChild(AudioBrowserDiv.Container); }
+	if(this.type == "image") { MainWindow.removeChild(ImageBrowserDiv.Container); }
+	if(this.type == "other") { MainWindow.removeChild(OtherBrowserDiv.Container); }
+
 	MainWindow.appendChild(MainMenuDiv.Load());
 }
 
@@ -380,7 +406,8 @@ if(this.ReturnedData) {
 		}
 	}
 
-	this.Table = new Table("VideoTable");
+	this.Table = new Table("VideoTable", this);
+	this.Table.Table.style.width = "100%";
 	 
 	this.Table.ColumnHeaders(this.ReturnedData.List[0]);
 
@@ -410,17 +437,19 @@ if(this.ReturnedData) {
 		this.Table.Table.rows[0].style.backgroundColor = 'black';
 		this.Table.Table.rows[0].style.color = 'white';
 		this.Table.Table.rows[0].style.fontWeight = "bold";
-	 
-		for(var i = 0; i<this.Table.Table.rows[0].cells.length; i++) {
-			this.Table.Table.rows[0].cells[i].style.width = "200px";
-		} 
 
+ 		for(var i=1; i<this.Table.Table.rows.length; i++) {
+			this.Table.Table.rows[i].style.backgroundColor = "lightslategray";
+		}
+
+		this.Table.RenameFileButton();	
 		this.Table.AddStreamButton();
-	 
+		
+		
 		this.BrowserWindow.appendChild(this.Table.ReturnTable());
 	}
 	else {
-	 
+
 		for(var i=0; i<this.ReturnedData.List.length; i++) {
 			var obj = this.ReturnedData.List[i];
 			this.Table.AddRow(obj);	 
@@ -429,14 +458,18 @@ if(this.ReturnedData) {
 		this.Table.Table.rows[0].style.backgroundColor = 'black';
 		this.Table.Table.rows[0].style.color = 'white';
 		this.Table.Table.rows[0].style.fontWeight = "bold";
-	 
-		for(var i = 0; i<this.Table.Table.rows[0].cells.length; i++) {
-			this.Table.Table.rows[0].cells[i].style.width = "200px";
-		} 
 
-		//this.Table.AddDownloadButton();
-		//this.Table.AddDeleteButton();
-		this.Table.AddStreamButton();		
+		for(var i=1; i<this.Table.Table.rows.length; i++) {
+			this.Table.Table.rows[i].style.backgroundColor = "lightslategray";
+		}
+	 
+
+		if(this.ReturnedData.List.length > 0) {
+
+		this.Table.RenameFileButton();	
+		this.Table.AddStreamButton();			
+
+		}
 	 
 		this.BrowserWindow.appendChild(this.Table.ReturnTable());		
  	}

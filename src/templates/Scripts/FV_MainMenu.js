@@ -1,6 +1,5 @@
 function MainMenu() {
 	this.Container = document.createElement("div");
-
 	this.VideoButton = null;
 	this.AudioButton = null;
 	this.ImageButton = null;
@@ -14,72 +13,97 @@ MainMenu.prototype.Load = function () {
 	return this.Container;
 }
 
+MainMenu.prototype.MouseOverChange = function (e) {
+	
+	var text = e.target;
+	text.style.color = "white";
+	text.style.fontSize = "100px";
+}
+
+MainMenu.prototype.MouseOutChange = function (e) {
+
+	var text = e.target;
+	text.style.color = "#616D7E";
+	text.style.fontSize = "70px";
+}
+
 MainMenu.prototype.CreateButtons = function() {
-	this.VideoButton = document.createElement('button');
-	this.VBdiv = document.createElement('div');
-	this.VideoButton.setAttribute('type','button');
-	this.VBdiv.setAttribute('id', "sup");
-	this.VideoButton.innerHTML = "Video";
+
+	this.VideoButton = document.createElement('div');
+	this.VideoButton.innerHTML = "Movies";
+	this.VideoButton.style.fontSize = "70px";
+	this.VideoButton.style.color = "#616D7E";
+	this.VideoButton.style.textAlign = "center";
 	this.VideoButton.setAttribute("position", "absolute");
-	this.VBdiv.setAttribute("position", "relative");
-	this.VideoButton.style.width = "300px";
-	this.VideoButton.style.height = "100px";
-	this.VideoButton.style.fontSize = "60px";
-	this.VBdiv.style.margin = "40px 0px 0px 41%";
+	this.VideoButton.onclick = this.VideoButtonPress;
+	this.VideoButton.onmouseover = this.create(this, this.MouseOverChange);
+	this.VideoButton.onmouseout = this.create(this, this.MouseOutChange);
+	this.VideoButton.style.cursor = 'pointer';
+	
+	this.VBdiv = document.createElement('div');
+	this.VBdiv.style.margin = "20px 0px 30px 0px";
 	this.VBdiv.appendChild(this.VideoButton);
-//	    slidingElement.addEventListener('touchstart', this.create(this, this.placement), false)
-  //  slidingElement.addEventListener('touchmove', this.create(this, this.movement), false)
-  	//this.VideoButton.onclick = this.create(this, this.TestButtonPress);
-  	this.VideoButton.onclick = this.VideoButtonPress;
-	
-	
-	this.AudioButton = document.createElement('button');
-	this.ABdiv = document.createElement('div');
-	this.AudioButton.setAttribute('type','button');
-	this.AudioButton.innerHTML = "Audio";
-	this.AudioButton.style.width = "300px";
-	this.AudioButton.style.height = "100px";
-	this.ABdiv.style.margin = "40px 0px 0px 41%";
-	this.AudioButton.style.fontSize = "60px";
+
+  	
+	this.AudioButton = document.createElement('div');
+	this.AudioButton.innerHTML = "Music";
+	this.AudioButton.style.fontSize = "70px";
+	this.AudioButton.style.color = "#616D7E";
+	this.AudioButton.style.textAlign = "center";
 	this.AudioButton.setAttribute("position", "absolute");
-	this.ABdiv.appendChild(this.AudioButton);
-	this.AudioButton.onclick = this.AudioButtonPress;	
-		
-	this.TextButton = document.createElement('button');
-	this.TBdiv = document.createElement('div');
-	this.TextButton.setAttribute('type','button');
-	this.TextButton.innerHTML = "Text";
-	this.TextButton.style.width = "300px";
-	this.TextButton.style.height = "100px";
-	this.TBdiv.style.margin = "40px 0px 0px 41%";	
-	this.TextButton.setAttribute("position", "absolute");
-	this.TextButton.style.fontSize = "60px";
-	this.TBdiv.appendChild(this.TextButton);
-	this.TextButton.onclick = this.TextButtonPress;
+	this.AudioButton.onclick = this.AudioButtonPress;
+	this.AudioButton.onmouseover = this.create(this, this.MouseOverChange);
+	this.AudioButton.onmouseout = this.create(this, this.MouseOutChange);
+	this.AudioButton.style.cursor = 'pointer';
 	
-	this.ImageButton = document.createElement('button');
-	this.IBdiv = document.createElement('div');
-	this.ImageButton.setAttribute('type','button');
-	this.ImageButton.innerHTML = "Images";
-	this.ImageButton.style.width = "300px";
-	this.ImageButton.style.height = "100px";
-	this.IBdiv.style.margin = "40px 0px 0px 41%";
+	this.ABdiv = document.createElement('div');
+	this.ABdiv.style.margin = "20px 0px 30px 0px";
+	this.ABdiv.appendChild(this.AudioButton);
+  	
+	this.TextButton = document.createElement('div');
+	this.TextButton.innerHTML = "Documents";
+	this.TextButton.style.fontSize = "70px";
+	this.TextButton.style.color = "#616D7E";
+	this.TextButton.style.textAlign = "center";
+	this.TextButton.setAttribute("position", "absolute");
+	this.TextButton.onclick = this.TextButtonPress;
+	this.TextButton.onmouseover = this.create(this, this.MouseOverChange);
+	this.TextButton.onmouseout = this.create(this, this.MouseOutChange);
+	this.TextButton.style.cursor = 'pointer';
+			
+	this.TBdiv = document.createElement('div');	
+	this.TBdiv.style.margin = "20px 0px 30px 0px";
+	this.TBdiv.appendChild(this.TextButton);
+
+	this.ImageButton = document.createElement('div');
+	this.ImageButton.innerHTML = "Photos";
+	this.ImageButton.style.fontSize = "70px";
+	this.ImageButton.style.color = "#616D7E";
+	this.ImageButton.style.textAlign = "center";
 	this.ImageButton.setAttribute("position", "absolute");
-	this.ImageButton.style.fontSize = "60px";
-	this.IBdiv.appendChild(this.ImageButton);
 	this.ImageButton.onclick = this.ImageButtonPress;
-		
-	this.OtherButton = document.createElement('button');
-	this.OBdiv = document.createElement('div');
-	this.OtherButton.setAttribute('type','button');
-	this.OtherButton.innerHTML = "Other";
-	this.OtherButton.style.width = "300px";
-	this.OtherButton.style.height = "100px";
-	this.OBdiv.style.margin = "40px 20px 0px 41%";
-	this.OtherButton.style.fontSize = "60px";
+	this.ImageButton.onmouseover = this.create(this, this.MouseOverChange);
+	this.ImageButton.onmouseout = this.create(this, this.MouseOutChange);
+	this.ImageButton.style.cursor = 'pointer';
+	
+	this.IBdiv = document.createElement('div');
+	this.IBdiv.style.margin = "20px 0px 30px 0px";
+	this.IBdiv.appendChild(this.ImageButton);
+
+	this.OtherButton = document.createElement('div');
+	this.OtherButton.innerHTML = "Miscellaneous";
+	this.OtherButton.style.fontSize = "70px";
+	this.OtherButton.style.color = "#616D7E";
+	this.OtherButton.style.textAlign = "center";
 	this.OtherButton.setAttribute("position", "absolute");
-	this.OBdiv.appendChild(this.OtherButton);
 	this.OtherButton.onclick = this.OtherButtonPress;
+	this.OtherButton.onmouseover = this.create(this, this.MouseOverChange);
+	this.OtherButton.onmouseout = this.create(this, this.MouseOutChange);
+	this.OtherButton.style.cursor = 'pointer';
+	
+	this.OBdiv = document.createElement('div');
+	this.OBdiv.style.margin = "20px 0px 30px 0px";
+	this.OBdiv.appendChild(this.OtherButton);
 	
 	this.Container.appendChild(this.VBdiv);
 	this.Container.appendChild(this.ABdiv);
@@ -97,9 +121,9 @@ MainMenu.prototype.VideoButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	//if(!VideoBrowserDiv) {
+	if(!VideoBrowserDiv) {
 		VideoBrowserDiv = new VideoBrowser("video");
-	//}
+	}
 	VideoBrowserDiv.Load();
 }
 
@@ -108,10 +132,10 @@ MainMenu.prototype.AudioButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	//if(!VideoBrowserDiv) {
-		VideoBrowserDiv = new VideoBrowser("audio");
-	//}
-	VideoBrowserDiv.Load();
+	if(!AudioBrowserDiv) {
+		AudioBrowserDiv = new VideoBrowser("audio");
+	}
+	AudioBrowserDiv.Load();
 }
 
 MainMenu.prototype.ImageButtonPress = function() {
@@ -119,10 +143,10 @@ MainMenu.prototype.ImageButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	//if(!VideoBrowserDiv) {
-		VideoBrowserDiv = new VideoBrowser("image");
-	//}
-	VideoBrowserDiv.Load();
+	if(!ImageBrowserDiv) {
+		ImageBrowserDiv = new VideoBrowser("image");
+	}
+	ImageBrowserDiv.Load();
 }
 
 MainMenu.prototype.TextButtonPress = function() {
@@ -130,10 +154,10 @@ MainMenu.prototype.TextButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	//if(!VideoBrowserDiv) {
-		VideoBrowserDiv = new VideoBrowser("text");
-	//}
-	VideoBrowserDiv.Load();
+	if(!TextBrowserDiv) {
+		TextBrowserDiv = new VideoBrowser("text");
+	}
+	TextBrowserDiv.Load();
 }
 
 MainMenu.prototype.OtherButtonPress = function() {
@@ -141,10 +165,10 @@ MainMenu.prototype.OtherButtonPress = function() {
 	MainWindow.removeChild(MainMenuDiv.Container);
 
 	//Create the video menu...
-	//if(!VideoBrowserDiv) {
-		VideoBrowserDiv = new VideoBrowser("other");
-	//}
-	VideoBrowserDiv.Load();
+	if(!OtherBrowserDiv) {
+		OtherBrowserDiv = new VideoBrowser("other");
+	}
+	OtherBrowserDiv.Load();
 }
 
 MainMenu.prototype.create = function(obj, func){

@@ -1,13 +1,14 @@
 
-function Table(string_TableName) {
+function Table(string_TableName, object) {
+	this.object = object;
 	this.Table = document.createElement('table');
 	this.Table.id = string_TableName;
 	this.Table.name = string_TableName;
 	this.Table.style.border = "1px";
-	this.Table.style.backgroundColor = "lightslategray";
+	this.Table.style.backgroundColor = "black";
 	this.Table.setAttribute("class", "sortable");
 	this.Table.setAttribute("className", "sortable");
-	this.Table.style.borderCollapse = "collapse";
+	//this.Table.style.borderCollapse = "collapse";
 
 	this.THead = this.Table.createTHead();
 
@@ -131,8 +132,21 @@ Table.prototype.AddDeleteButton = function() {
 	}
 }
 
-//<form id="delete" method="post" action="/delete"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Delete"></form>
-//<td><form method="post" action="/download"><input type="hidden" name="NAME" value="{{ file.name }}"><input type="submit" value="Download"></form></td>
+Table.prototype.RenameFileButton = function() {
+
+	var RenameFileColumn = this.Table.rows[0].insertCell(-1);
+	RenameFileColumn.innerHTML = "Rename";
+
+	for(var i=1; i< this.Table.rows.length; i++) {
+		var CCell = this.Table.rows[i].insertCell(-1);
+		var deleteButton = document.createElement("input");
+		deleteButton.type = "Submit";
+		deleteButton.value = "Rename";
+		deleteButton.onclick = this.create(this, this.LaunchRenameModal);
+		CCell.appendChild(deleteButton);
+
+	}
+}
 
 
 Table.prototype.LaunchModal = function(e) {
@@ -140,6 +154,20 @@ Table.prototype.LaunchModal = function(e) {
 		for(var j=0; j<this.Table.rows[i].cells.length; j++) {
 			if(e.target == this.Table.rows[i].cells[j]) {
 				var Modal = new ModalStream(this.Table.rows[i]);	
+			}
+		}
+	}	
+}
+
+Table.prototype.LaunchRenameModal = function(e) {
+	
+	for(var i=0; i<this.Table.rows.length; i++) {
+		
+		for(var j=0; j<this.Table.rows[i].cells.length; j++) {
+
+			if(e.target.parentElement == this.Table.rows[i].cells[j]) {
+				
+				var Modal = new ModalRename(this.Table.rows[i], this.object);	
 			}
 		}
 	}	
