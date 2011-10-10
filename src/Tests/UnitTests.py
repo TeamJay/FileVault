@@ -10,6 +10,24 @@ class TestModel(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     owner = db.UserProperty(auto_current_user_add=True)
     download_url = db.StringProperty()
+    
+class TestModelTwo(db.Model):
+    name = db.StringProperty(required=True)
+    data = db.BlobProperty(required=True)
+    mimeType = db.StringProperty(required=True)
+    fileType = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    owner = db.UserProperty(auto_current_user_add=True)
+    download_url = db.StringProperty()
+    
+class TestModelThree(db.Model):
+    name = db.StringProperty(required=True)
+    data = db.BlobProperty(required=True)
+    mimeType = db.StringProperty(required=True)
+    fileType = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    owner = db.UserProperty(auto_current_user_add=True)
+    download_url = db.StringProperty()
 
 class Test(unittest.TestCase):
 
@@ -60,7 +78,36 @@ class Test(unittest.TestCase):
         TestModel(name="file", data="1", mimeType="text/plain").put()
         content = db.Query(TestModel).fetch(1)
         self.assertEqual("1", content[0].data)
-        self.assertEqual("text/plain", content[0].mimeType)   
+        self.assertEqual("text/plain", content[0].mimeType)
+        
+    """ Test if item in datastore gets renamed """
+    def testRename(self):
+        TestModel(name="file", data="1", mimeType="text/plain").put()
+        
+        q = db.GqlQuery("SELECT * FROM TestModel where name = 'file'")
+        for data in q:
+            if data.name:
+                data.name = 'newFileName'
+                db.put(data)
+                
+        q = db.Query(TestModel).filter("name", "newFileName").fetch(1)  
+        self.assertEqual(q[0].name, "newFileName")
+        
+    """ Test if content gets filtered by types """
+    def testFilteredContent(self):        
+        TestModelTwo(name="file2", data="1", mimeType="video/ogg", fileType="video").put()
+        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        TestModelThree(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        q = db.Query(TestModelTwo).filter("fileType", "text").fetch(2)
+        q2 = db.Query(TestModelThree).fetch(2)
+        self.assertEqual(q[0].fileType, q2[0].fileType)
+        
+    """ Test uploading same name file detected """
+    def testCheckUploadNameExists(self):
+        TestModel(name="file", data="1", mimeType="text/plain").put()  
+        TestModel(name="file", data="1", mimeType="text/plain").put()       
+        q = db.Query(TestModel).filter('name', "file").count(4)
+        self.assertEqual(q, 2)
 
 
 if __name__ == "__main__":
