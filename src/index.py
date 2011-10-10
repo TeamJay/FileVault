@@ -55,7 +55,6 @@ class UploadHandler(webapp.RequestHandler):
             obj.put()           
             
             file_url = "http://%s/%d/%s" % (self.request.host, obj.key().id(), allfiles.filename)
-            file_url = "<a href='%s'>%s</a>" % (file_url,file_url)
                 
             obj.download_url=file_url
             obj.put()
@@ -72,8 +71,7 @@ def getContentType(fileType):
     return "other"
 
 class ContentHandler(webapp.RequestHandler):
-    def get(self):  
-        
+    def get(self):          
         content = self.request.get('content')
         file_list = db.Query(FileModel).order('-created').filter('fileType', content)      
         outstr = template.render('templates/content.html', {'file_list': file_list})
@@ -83,18 +81,30 @@ class DeleteHandler(webapp.RequestHandler):
     def post(self):
         name = self.request.get('value')       
         q = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'") 
-        db.delete(q)      
+        db.delete(q)
+
+class RenameHandler(webapp.RequestHandler):
+    def post(self):
+        
+        oldname = self.request.get('oldname')
+        newname = self.request.get('newname')
+        
+        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + oldname + "'")
+        for data in q:
+            if data.name:
+                data.name = newname
+                db.put(data)
         
 class DownloadHandler(webapp.RequestHandler):
     def post(self):
-        name = self.request.get('value')
+        name = self.request.get('NAME')
         
         FileModel = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
         for data in FileModel:
             if data.name:
                 self.response.headers['Content-Disposition'] = 'attachment; filename="%s"' % str(data.name)
                 self.response.headers['Content-Type'] = data.mimeType
-                self.response.out.write(data.data)
+                self.response.out.write(data.data) 
                 
 class StreamHandler(webapp.RequestHandler):
     def get(self,id,filename):
@@ -108,6 +118,7 @@ application = webapp.WSGIApplication([
                                       ('/content', ContentHandler),
                                       ('/upload', UploadHandler),
                                       ('/delete', DeleteHandler),
+                                      ('/rename', RenameHandler),
                                       ('/.*', MainHandler)],
                                       debug=True)
 
