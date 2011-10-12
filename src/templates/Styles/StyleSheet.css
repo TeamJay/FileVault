@@ -1,0 +1,41 @@
+.example {
+  	  padding: 10px;
+		  border: 1px solid #ccc;
+		}
+		
+#drop_zone {
+		  border: 2px dashed #bbb;
+		  -moz-border-radius: 5px;
+		  padding: 100px;
+		  text-align: center;
+		}
+		
+div#Title {
+        position:absolute;
+        top:0%;
+        left: 0px;
+        font: oblique;
+        font-size:110px;
+        color:white;
+        border: 0.1% solid #333333;
+        -moz-border-radius : 10px;
+        height: 15%;
+        width: 100%;
+        z-index:100;
+        background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#000)); /* for webkit browsers */
+        background: -moz-linear-gradient(top,  #ccc,  #000); /* for firefox 3.6+ */
+        }
+        
+div#MainWindow {
+            position:absolute;
+            top:0%;
+            left:0px;
+            border: 0.1% solid #333333;
+            -moz-border-radius : 10px;
+            height:85%;
+            width: 100%;
+            margin: 15% 0px 0px 0px;
+            z-index:101;
+            background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#000)); /* for webkit browsers */
+            background: -moz-linear-gradient(top,  #ccc,  #000); /* for firefox 3.6+ */
+            }
