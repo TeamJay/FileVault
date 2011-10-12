@@ -3,6 +3,8 @@ import unittest
 from google.appengine.ext import db
 from google.appengine.ext import testbed
 
+import datetime 
+
 class TestModel(db.Model):
     name = db.StringProperty(required=True)
     data = db.BlobProperty(required=True)
@@ -49,14 +51,15 @@ class Test(unittest.TestCase):
         TestModel(name="file", data="1", mimeType="text/plain").put()
         # get entity from datastore, (is one and only entry) thus ID = 1
         name = TestModel.get_by_id(1).name
-        self.assertEquals(name, "file")     
+        self.assertEquals(name, "file")
         
     """ Test for multiple content added to the datastore for displaying """
     def testMultiContent(self):
         TestModel(name="file", data="1", mimeType="text/plain").put()
         TestModel(name="file1", data="1", mimeType="text/plain").put()
         content = db.Query(TestModel)
-        self.assertEquals(content[1].name, "file1") 
+        self.assertEquals(content[0].name, "file")
+        self.assertEquals(content[1].name, "file1")
         
     """ Test for correct ordered content added to the datastore for displaying """
     def testMultiOrderedContent(self):
@@ -73,12 +76,48 @@ class Test(unittest.TestCase):
         result = db.Query(TestModel).count(1)
         self.assertEqual(0, result)
         
-    """ Test get mimeType and Data for downloading, streaming and viewing via the browser """
-    def testDownloadViewStream(self):
+    """ Test get mime type for downloading, streaming and viewing via the browser """
+    def testGetMimeType(self):
         TestModel(name="file", data="1", mimeType="text/plain").put()
         content = db.Query(TestModel).fetch(1)
-        self.assertEqual("1", content[0].data)
         self.assertEqual("text/plain", content[0].mimeType)
+        
+    """ Test get Data for downloading, streaming and viewing via the browser """
+    def testGetData(self):
+        TestModel(name="file", data="1", mimeType="text/plain").put()
+        content = db.Query(TestModel).fetch(1)
+        self.assertEqual("1", content[0].data)   
+        
+    """ Test get name from datastore """
+    def testGetName(self):
+        TestModel(name="file", data="1", mimeType="text/plain").put()
+        content = db.Query(TestModel).fetch(1)
+        self.assertEqual("file", content[0].name)
+        
+    """ Test get file type from datastore """
+    def testGetFileType(self):
+        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        content = db.Query(TestModelTwo).fetch(1)
+        self.assertEqual("text", content[0].fileType) 
+        
+    """ Test get time file was created from datastore, maybe fail (test) on slow comp :/ """
+    def testGetCreated(self):
+        date = datetime.datetime.now()
+        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        content = db.Query(TestModelTwo).fetch(1)        
+        self.assertEqual(date, content[0].created)    
+        
+    """ Test get owner from datastore, none since not logged in """
+    def testGetOwner(self):
+        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        content = db.Query(TestModelTwo).fetch(1)
+        self.assertEqual(None, content[0].owner)
+        
+    """ Test get download url """
+    def testGetURL(self):
+        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text", download_url="http://site/image.png").put()
+        content = db.Query(TestModelTwo).fetch(1)
+        self.assertEqual("http://site/image.png", content[0].download_url)         
         
     """ Test if item in datastore gets renamed """
     def testRename(self):
@@ -107,7 +146,7 @@ class Test(unittest.TestCase):
         TestModel(name="file", data="1", mimeType="text/plain").put()  
         TestModel(name="file", data="1", mimeType="text/plain").put()       
         q = db.Query(TestModel).filter('name', "file").count(4)
-        self.assertEqual(q, 2)
+        self.assertEqual(q, 2) #detects two occurances
 
 
 if __name__ == "__main__":
