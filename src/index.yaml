@@ -18,6 +18,13 @@ indexes:
 
 - kind: FileModel
   properties:
+  - name: fileType
+  - name: owner
+  - name: created
+    direction: desc
+
+- kind: FileModel
+  properties:
   - name: mimeType
   - name: created
     direction: desc
