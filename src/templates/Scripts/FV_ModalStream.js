@@ -13,11 +13,11 @@ function ModalStream(src) {
 	console.log(this.Src);
 	
 	this.Container = document.createElement("div");
-	this.Container.style.height = document.height + "px";
-	this.Container.style.width =  document.width + "px";
+	this.Container.style.height = "100%";
+	this.Container.style.width =  "100%";
 	this.Container.style.backgroundColor = "black";
 	this.Container.style.opacity = "1";
-	this.MainWindow.style.opacity = "0.25";
+	this.MainWindow.style.opacity = "1";
 	
 	this.Modal = document.createElement("div");
 
@@ -57,18 +57,18 @@ ModalStream.prototype.CreateModal = function() {
 	this.Modal.style.borderStyle = "solid";
 	this.Modal.style.borderColor = "silver";
 	this.Modal.style.borderWidth = "5px";
-	this.Modal.style.height = "500px";
-	this.Modal.style.width = "500px";
+	this.Modal.style.height = "1000px";
+	this.Modal.style.width = "1000px";
 	this.Modal.style.position = "Absolute"
 	this.Modal.style.backgroundColor = "black";
 
 	this.Modal.style.top =  "50%";
 	this.Modal.style.left =  "50%";
-	this.Modal.style.marginTop = -500/2 + "px";
-	this.Modal.style.marginLeft = -500/2 + "px";
+	this.Modal.style.marginTop = -1000/2 + "px";
+	this.Modal.style.marginLeft = -1000/2 + "px";
 
 	var Player = document.createElement("a");
-	Player.className = "media { width:500, height:480}";
+	Player.className = "media { width:1000, height:1000}";
 	Player.href = this.Src;
 	
         this.Modal.appendChild(this.CloseButton());
