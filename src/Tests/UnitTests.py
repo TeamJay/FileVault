@@ -29,8 +29,9 @@ class TestModelThree(db.Model):
     fileType = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     owner = db.UserProperty(auto_current_user_add=True)
+    public = db.BooleanProperty(required=True)
     download_url = db.StringProperty()
-
+    
 class Test(unittest.TestCase):
 
     def setUp(self):
@@ -134,12 +135,18 @@ class Test(unittest.TestCase):
         
     """ Test if content gets filtered by types """
     def testFilteredContent(self):        
-        TestModelTwo(name="file2", data="1", mimeType="video/ogg", fileType="video").put()
-        TestModelTwo(name="file", data="1", mimeType="text/plain", fileType="text").put()
-        TestModelThree(name="file", data="1", mimeType="text/plain", fileType="text").put()
+        TestModelTwo(name="file1", data="1", mimeType="video/ogg", fileType="video").put()
+        TestModelTwo(name="file2", data="1", mimeType="text/plain", fileType="text").put()
+        TestModelThree(name="file", data="1", mimeType="text/plain", fileType="text", public=False).put()
         q = db.Query(TestModelTwo).filter("fileType", "text").fetch(2)
         q2 = db.Query(TestModelThree).fetch(2)
         self.assertEqual(q[0].fileType, q2[0].fileType)
+        
+    """ Test if content is set to public """
+    def testPublicContent(self):
+        TestModelThree(name="file", data="1", mimeType="text/plain", fileType="text", public=False).put()
+        q = db.Query(TestModelThree).fetch(2)
+        self.assertEqual(q[0].public, False)
         
     """ Test uploading same name file detected """
     def testCheckUploadNameExists(self):
