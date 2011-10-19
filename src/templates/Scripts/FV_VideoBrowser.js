@@ -156,6 +156,15 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.Fdiv.style.float = "left";
 	this.Fdiv.style.cssFloat = "left";
 
+	var OptionsArray = ["All","Name", "Source", "Type"];
+
+	for(var i=0; i<OptionsArray.length; i++) {
+		var Option = document.createElement("option");
+		Option.innerHTML = OptionsArray[i];
+		this.FilterBy.appendChild(Option);
+	}
+	
+
 	//search input
 	this.Sdiv = document.createElement('div');
 	this.Sdiv.style.position = "relative";
@@ -413,7 +422,7 @@ if(this.ReturnedData) {
 
 	if(string_SearchParamater) {
 		//create pattern from input
-		var patt = RegExp(string_SearchParamater, "ig"); 
+		var patt = RegExp(string_SearchParamater, "i"); 
 
 		//Test each value in all cells in the table with the pattern
 		//	-If successful -> AddRow
@@ -424,8 +433,23 @@ if(this.ReturnedData) {
 		for(var i=0; i<this.ReturnedData.List.length; i++) {
 			
 			for(var key in this.ReturnedData.List[i]) {
-				if(patt.test(this.ReturnedData.List[i][key])) {
-					AddRow[i] = this.ReturnedData.List[i];
+				
+				//Check key against the selected option...
+				if(this.FilterBy.value == "All") {
+					if(patt.test(this.ReturnedData.List[i][key])) {
+						AddRow[i] = this.ReturnedData.List[i];
+					}
+				}
+
+				else {
+
+					if(key == this.FilterBy.value) {
+						if(patt.test(this.ReturnedData.List[i][key])) {
+							console.log(this.ReturnedData.List[i]);
+							AddRow[i] = this.ReturnedData.List[i];
+						}
+					}
+
 				}
 			}		
 		}
@@ -442,6 +466,7 @@ if(this.ReturnedData) {
 			this.Table.Table.rows[i].style.backgroundColor = "lightslategray";
 		}
 
+		this.Table.AddCheckBox();
 		this.Table.RenameFileButton();	
 		this.Table.AddStreamButton();
 		
@@ -466,8 +491,10 @@ if(this.ReturnedData) {
 
 		if(this.ReturnedData.List.length > 0) {
 
+		this.Table.AddCheckBox();
 		this.Table.RenameFileButton();	
-		this.Table.AddStreamButton();			
+		this.Table.AddStreamButton();
+					
 
 		}
 	 
