@@ -78,6 +78,42 @@ Table.prototype.AddStreamButton = function() {
 	}
 }
 
+Table.prototype.AddCheckBox = function() {
+
+	var CheckColumn = this.Table.rows[0].insertCell(-1);
+	CheckColumn.innerHTML = "Public";
+
+	for(var i=1; i< this.Table.rows.length; i++) {
+		var name = "";
+		var CCell = this.Table.rows[i].insertCell(-1);
+		var checkbox = document.createElement("input");
+		checkbox.type = "CHECKBOX";
+		
+		checkbox.onclick = function() {
+
+		var row = CCell.parentNode;
+		for(var i=0; i< row.childNodes.length; i++) {
+			if(row.childNodes[i].id == "Name") { name = row.childNodes[i].innerHTML; }
+		}
+
+		$.ajax({
+			url: "/public",
+			cache: false,
+			data: { name : name, status : this.checked.toString()},
+			success: function(html){
+				$("#BrowserWindow").html(html);	
+				closure.ReturnedData = objectList;	
+				closure.VideoBrowserMaker();			
+			}
+		});
+
+		}
+		
+		CCell.appendChild(checkbox);
+
+	}
+}
+
 Table.prototype.AddDownloadButton = function() {
 
 	var DownloadColumn = this.Table.rows[0].insertCell(-1);
