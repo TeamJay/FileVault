@@ -13,6 +13,7 @@ class FileModel(db.Model):
     fileType = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     owner = db.UserProperty(auto_current_user_add=True)
+    public = db.BooleanProperty(required=True)
     download_url = db.StringProperty()
  
 class MainHandler(webapp.RequestHandler):    
@@ -36,12 +37,12 @@ class MainHandler(webapp.RequestHandler):
  
 class UploadHandler(webapp.RequestHandler):
     def post(self):
-        files = self.request.POST.multi.__dict__['_items']        
+        files = self.request.POST.multi.__dict__['_items']
         
         for allfiles in files:         
             allfiles = allfiles[1]
             
-            q = db.Query(FileModel).filter('name', allfiles.filename).count(1)
+            q = db.Query(FileModel).filter('name', allfiles.filename).filter('owner', users.get_current_user()).count(1)
             
             if q >= 1:                             
                 self.response.headers['Content-Type'] = "text/html"
@@ -51,7 +52,8 @@ class UploadHandler(webapp.RequestHandler):
                 
             obj = FileModel(name=allfiles.filename,
                                 data=allfiles.value, mimeType=allfiles.type, 
-                                fileType=getContentType(allfiles.type))
+                                fileType=getContentType(allfiles.type),
+								public=False)
             obj.put()           
             
             file_url = "http://%s/%d/%s" % (self.request.host, obj.key().id(), allfiles.filename)
@@ -63,44 +65,55 @@ class UploadHandler(webapp.RequestHandler):
             
 """ helper get category """
 def getContentType(fileType): 
-    content = fileType.split('/')[0].lower()
-    if content == 'video': return 'video'
-    if content == 'audio': return 'audio'
-    if content == 'image': return 'image'
-    if content == 'text': return 'text'
-    return "other"
+    if fileType != 'application/pdf':
+        content = fileType.split('/')[0].lower()
+        if content == 'video': return 'video'
+        if content == 'audio': return 'audio'
+        if content == 'image': return 'image'
+        if content == 'text': return 'text'
+        return 'other'
+    return 'text'
 
 class ContentHandler(webapp.RequestHandler):
-    def get(self):          
+    def get(self):  
         content = self.request.get('content')
-        file_list = db.Query(FileModel).order('-created').filter('fileType', content)      
+        file_list = db.Query(FileModel).order('-created').filter('fileType', content).filter('owner', users.get_current_user())      
         outstr = template.render('templates/content.html', {'file_list': file_list})
         self.response.out.write(outstr)
         
 class DeleteHandler(webapp.RequestHandler):
     def post(self):
-        name = self.request.get('value')       
-        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'") 
+        q = db.Query(FileModel).filter('owner', users.get_current_user()).filter('name', self.request.get('value'))
         db.delete(q)
 
 class RenameHandler(webapp.RequestHandler):
     def post(self):
         
-        oldname = self.request.get('oldname')
         newname = self.request.get('newname')
-        
-        q = db.GqlQuery("SELECT * FROM FileModel where name = '" + oldname + "'")
+
+        q = db.Query(FileModel).filter('owner', users.get_current_user()).filter('name', self.request.get('oldname'))
         for data in q:
             if data.name:
                 data.name = newname
                 db.put(data)
+                
+class PublicChanger(webapp.RequestHandler):
+    def post(self):
+        
+        name = self.request.get('name')
+        status = self.request.get('public')
+
+        q = db.Query(FileModel).filter('owner', users.get_current_user()).filter('name', name)
+        for data in q:
+            if data.name:
+                data.public = status
+                db.put(data)
         
 class DownloadHandler(webapp.RequestHandler):
     def post(self):
-        name = self.request.get('NAME')
-        
-        FileModel = db.GqlQuery("SELECT * FROM FileModel where name = '" + name + "'")
-        for data in FileModel:
+        q = db.Query(FileModel).filter('owner', users.get_current_user()).filter('name', self.request.get('NAME'))
+
+        for data in q:
             if data.name:
                 self.response.headers['Content-Disposition'] = 'attachment; filename="%s"' % str(data.name)
                 self.response.headers['Content-Type'] = data.mimeType
@@ -119,6 +132,7 @@ application = webapp.WSGIApplication([
                                       ('/upload', UploadHandler),
                                       ('/delete', DeleteHandler),
                                       ('/rename', RenameHandler),
+									  ('/publicchange', PublicChanger),
                                       ('/.*', MainHandler)],
                                       debug=True)
 
