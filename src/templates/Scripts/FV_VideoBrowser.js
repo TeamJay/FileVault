@@ -466,7 +466,7 @@ if(this.ReturnedData) {
 			this.Table.Table.rows[i].style.backgroundColor = "lightslategray";
 		}
 
-		this.Table.AddCheckBox();
+		//this.Table.AddCheckBox();
 		this.Table.RenameFileButton();	
 		this.Table.AddStreamButton();
 		
@@ -491,7 +491,7 @@ if(this.ReturnedData) {
 
 		if(this.ReturnedData.List.length > 0) {
 
-		this.Table.AddCheckBox();
+		//this.Table.AddCheckBox();
 		this.Table.RenameFileButton();	
 		this.Table.AddStreamButton();
 					
