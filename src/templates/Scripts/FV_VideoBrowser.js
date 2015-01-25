@@ -1,4 +1,3 @@
-
 /*
 jQuery.download = function(url, data, method){
 	//url and data options required
@@ -91,7 +90,7 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	//upload
 	this.UBdiv = document.createElement('div');
 	this.UBdiv.style.position = "relative";
-	this.UBdiv.style.margin = "0px 0px 0px 300px";
+	this.UBdiv.style.margin = "0px 0px 0px 5%";
 	this.UBdiv.style.float = "left";
 	this.UBdiv.style.cssFloat = "left";
 	
@@ -200,9 +199,9 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.BrowserWindow.style.mozBorderRadius = "15px";
 	this.BrowserWindow.style.borderRadius = "15px";
 	this.BrowserWindow.style.position = "absolute";
-	this.BrowserWindow.style.width = "1100px";
-	this.BrowserWindow.style.height = "700px";
-	this.BrowserWindow.style.margin = "45px 0px 0px 300px";
+	this.BrowserWindow.style.width = "90%";
+	this.BrowserWindow.style.height = "85%";
+	this.BrowserWindow.style.margin = "8% 0px 0px 5%";
 	this.BrowserWindow.style.overflow = "auto";
 
 	this.Container.appendChild(this.BrowserWindow);	
@@ -216,7 +215,7 @@ VideoBrowser.prototype.GenerateLayout = function() {
 	this.ReturnButton.style.fontSize = "20px";
 	this.RBdiv.style.fontSize = "20px";
 	this.ReturnButton.style.margin = "0px 0px 0px 0px";
-	this.RBdiv.style.margin = "765px 0px 0px 780px";
+	this.RBdiv.style.margin = "95% 0px 0px 65%";
 	this.RBdiv.appendChild(this.ReturnButton);
 	this.RBdiv.style.float = "left";
 	this.RBdiv.style.cssFloat = "left";
@@ -505,4 +504,5 @@ if(this.ReturnedData) {
 	Table1Sorter.init(this.Table.Table);
 	}
 }
+
 
